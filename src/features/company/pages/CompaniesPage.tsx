@@ -1,9 +1,11 @@
+//src/features/company/pages/CompaniesPage.tsx
 import { useState } from "react";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   EyeIcon,
   PencilIcon,
+  Plus,
   SearchIcon,
   Trash2Icon,
 } from "lucide-react";
@@ -127,8 +129,19 @@ const CompaniesPage = () => {
             />
           </div>
 
-          <div className="text-sm text-slate-500">
-            {meta?.total || 0} entreprise(s)
+          <div className="flex items-center gap-3">
+            <div className="text-sm text-slate-500">
+              {meta?.total || 0} entreprise(s)
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/companies/create")}
+              className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg text-sm text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Ajouter une entreprise
+            </button>
           </div>
         </div>
       </div>
@@ -198,8 +211,16 @@ const CompaniesPage = () => {
                     <tr key={company.id} className="hover:bg-slate-50/70">
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold">
-                            {company.name.charAt(0).toUpperCase()}
+                          <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold overflow-hidden">
+                            {company.logoUrl ? (
+                              <img
+                                src={`${import.meta.env.VITE_API_BASE_URL}${company.logoUrl}`}
+                                alt={company.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              company.name.charAt(0).toUpperCase()
+                            )}
                           </div>
 
                           <div>

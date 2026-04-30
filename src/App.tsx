@@ -12,6 +12,9 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import RegisterForm from "./features/auth/components/RegisterForm";
 import CompaniesPage from "./features/company/pages/CompaniesPage";
+import CompanyDetailPage from "./features/company/pages/CompanyDetailPage";
+import CompanyEditPage from "./features/company/pages/CompanyEditPage";
+import CompanyCreatePage from "./features/company/pages/CompanyCreatePage";
 
 const App = () => {
   return (
@@ -27,7 +30,12 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+
             <Route path="/companies" element={<CompaniesPage />} />
+            <Route path="/companies/create" element={<CompanyCreatePage />} />
+            <Route path="/companies/:id" element={<CompanyDetailPage />} />
+            <Route path="/companies/:id/edit" element={<CompanyEditPage />} />
+
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/leave" element={<Leave />} />
             <Route path="/payslips" element={<Payslips />} />

@@ -1,12 +1,18 @@
+// src/features/company/hooks/useCompany.ts
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  createCompanyApi,
   deleteCompanyApi,
   getCompaniesApi,
   getCompanyByIdApi,
+  updateCompanyApi,
   updateCompanyStatusApi,
 } from "../api/company.api";
 import {
   CompanyQueryParams,
+  CreateCompanyPayload,
+  UpdateCompanyPayload,
   UpdateCompanyStatusPayload,
 } from "../types/company.types";
 
@@ -25,6 +31,36 @@ export const useCompanyById = (id?: string) => {
   });
 };
 
+export const useCreateCompany = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: CreateCompanyPayload) => createCompanyApi(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+    },
+  });
+};
+
+export const useUpdateCompany = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: UpdateCompanyPayload;
+    }) => updateCompanyApi({ id, payload }),
+
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["company", variables.id] });
+    },
+  });
+};
+
 export const useUpdateCompanyStatus = () => {
   const queryClient = useQueryClient();
 
@@ -32,8 +68,9 @@ export const useUpdateCompanyStatus = () => {
     mutationFn: (payload: UpdateCompanyStatusPayload) =>
       updateCompanyStatusApi(payload),
 
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["companies"] });
+      queryClient.invalidateQueries({ queryKey: ["company", variables.id] });
     },
   });
 };
