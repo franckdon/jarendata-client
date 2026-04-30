@@ -5,12 +5,15 @@ const LoginLeftSide = () => {
 
       <div className="relative z-10 flex flex-col items-start justify-center p-12 lg:p-20 w-full h-full">
         <h1 className="text-4xl lg:text-5xl font-medium text-white mn-6 leading-tight tracking-tight">
-          Employee <br /> Management System
+          Jarendata
         </h1>
+        <h2 className="text-2xl lg:text-3xl font-medium text-white mn-6 leading-tight tracking-tight">
+          WhatsApp-Powered Customer Intelligence
+        </h2>
         <p className="text-slate-400 text-lg max-w-md leading-relaxed">
           {" "}
-          Streamline your workforce operations, track attendance, mange payroll,
-          and empower your team securely.
+          Launch surveys, collect verified customer data, and understand your
+          market faster through WhatsApp conversations.
         </p>
       </div>
     </div>

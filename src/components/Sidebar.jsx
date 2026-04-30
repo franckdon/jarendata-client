@@ -13,11 +13,16 @@ import {
   UserIcon,
   XIcon,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../features/auth/store/auth.store";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
   const [userName, setUserName] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
     setUserName(dummyProfileData.firstName + " " + dummyProfileData.lastName);
@@ -28,7 +33,7 @@ const Sidebar = () => {
     setMobileOpen(false);
   }, [pathname]);
 
-  const role = "ADMIN" || "EMPLOYEE"; // Replace with actual role logic
+  const role = useAuthStore((s) => s.user?.role);
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutGridIcon },
@@ -41,8 +46,8 @@ const Sidebar = () => {
   ];
 
   const handleLogout = () => {
-    // Implement logout logic here (e.g., clear auth tokens, redirect to login page)
-    window.location.href = "/login"; // Redirect to login page after logout
+    logout(); // clear token + store
+    navigate("/login"); // redirection propre
   };
 
   const sidebarContent = (

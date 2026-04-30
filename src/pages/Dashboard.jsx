@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import {
-  dummyAdminDashboardData,
-  dummyEmployeeDashboardData,
-} from "../assets/assets";
+import { dummyAdminDashboardData } from "../assets/assets";
 import Loading from "../components/Loading";
-import EmployeeDashboard from "../components/EmployeeDashboard";
+import CompanyDashboard from "../components/CompanyDashboard";
 import AdminDashboard from "../components/AdminDashboard";
+import { useAuthStore } from "../features/auth/store/auth.store";
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
     setData(dummyAdminDashboardData);
@@ -19,19 +19,13 @@ const Dashboard = () => {
     }, 1000);
   }, []);
 
-  if (loading) return <Loading />;
-  if (!data)
-    return (
-      <p className="text-center text-slate-500 py-12">
-        Failed to load dashboard
-      </p>
-    );
+  if (!user) return <Loading />;
 
-  if (data.role === "ADMIN") {
-    return <AdminDashboard data={data} />;
-  } else {
-    return <EmployeeDashboard data={data} />;
+  if (user.role === "ADMIN") {
+    return <AdminDashboard data={{ data }} />;
   }
+
+  return <CompanyDashboard data={{ data }} />;
 };
 
 export default Dashboard;

@@ -7,7 +7,7 @@ import {
 import React from "react";
 import { Link } from "react-router-dom";
 
-const EmployeeDashboard = ({ data }) => {
+const CompanyDashboard = ({ data }) => {
   const emp = data.employee;
 
   const cards = [
@@ -78,4 +78,4 @@ const EmployeeDashboard = ({ data }) => {
   );
 };
 
-export default EmployeeDashboard;
+export default CompanyDashboard;
