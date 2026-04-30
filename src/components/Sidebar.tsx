@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { dummyProfileData } from "../assets/assets";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  BuildingIcon,
   CalendarIcon,
   ChevronRightIcon,
   DollarSignIcon,
@@ -13,32 +12,33 @@ import {
   UserIcon,
   XIcon,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useAuthStore } from "../features/auth/store/auth.store";
 
 const Sidebar = () => {
   const { pathname } = useLocation();
-  const [userName, setUserName] = useState("");
-  const [mobileOpen, setMobileOpen] = useState(false);
-
   const navigate = useNavigate();
+
+  const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
-  useEffect(() => {
-    setUserName(dummyProfileData.firstName + " " + dummyProfileData.lastName);
-  }, []);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  //close mobile sidebar on route change
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+  const userName = user?.fullName || "Utilisateur";
+  const role = user?.role;
+  const companyName = user?.company?.name;
 
-  const role = useAuthStore((s) => s.user?.role);
+  const initials = userName
+    .split(" ")
+    .map((part) => part.charAt(0))
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutGridIcon },
     role === "ADMIN"
-      ? { name: "Employees", href: "/employees", icon: UserIcon }
+      ? { name: "Entreprises", href: "/companies", icon: BuildingIcon }
       : { name: "Attendance", href: "/attendance", icon: CalendarIcon },
     { name: "Leave", href: "/leave", icon: FileTextIcon },
     { name: "Payslips", href: "/payslips", icon: DollarSignIcon },
@@ -46,27 +46,37 @@ const Sidebar = () => {
   ];
 
   const handleLogout = () => {
-    logout(); // clear token + store
-    navigate("/login"); // redirection propre
+    logout();
+    navigate("/login", { replace: true });
   };
+
+  const roleLabel =
+    role === "ADMIN"
+      ? "Administrateur"
+      : user?.companyRole === "OWNER"
+        ? "Propriétaire"
+        : user?.companyRole === "MANAGER"
+          ? "Manager"
+          : user?.companyRole === "ANALYST"
+            ? "Analyste"
+            : "Membre";
 
   const sidebarContent = (
     <>
-      {/* Brand header */}
       <div className="px-5 pt-6 pb-5 border-b border-white/6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <UserIcon className="text-white size-7" />
             <div>
               <p className="font-semibold text-[13px] text-white tracking-wide">
-                Employee MS
+                Jarendata
               </p>
               <p className="text-[11px] text-slate-500 font-medium">
-                Management System
+                Customer Insights
               </p>
             </div>
           </div>
-          {/* Close Menu on Mobile */}
+
           <button
             onClick={() => setMobileOpen(false)}
             className="lg:hidden text-slate-400 hover:text-white p-1"
@@ -76,28 +86,31 @@ const Sidebar = () => {
         </div>
       </div>
 
-      {/* user profile card  */}
-
-      {userName && (
-        <div className="mx-3 mt-4 mb-1 p-3 rouded-lg bg-white/3">
+      {user && (
+        <div className="mx-3 mt-4 mb-1 p-3 rounded-lg bg-white/3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center ring-1 ring-white/10 shrink-0">
-              <span className="text-xs text-slate-400 font-semibold">
-                {userName.charAt(0).toUpperCase()}
+              <span className="text-xs text-slate-300 font-semibold">
+                {initials}
               </span>
             </div>
+
             <div className="min-w-0">
               <p className="text-[13px] font-medium text-slate-200 truncate">
                 {userName}
               </p>
-              <p className="text-[11px] text-slate-500 truncate">
-                {role === "ADMIN" ? "Administrator" : "Employee"}
-              </p>
+
+              <p className="text-[11px] text-slate-500 truncate">{roleLabel}</p>
+
+              {companyName && (
+                <p className="text-[11px] text-slate-600 truncate">
+                  {companyName}
+                </p>
+              )}
             </div>
           </div>
         </div>
       )}
-      {/* Section label  */}
 
       <div className="px-5 pt-5 pb-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-500">
@@ -105,23 +118,35 @@ const Sidebar = () => {
         </p>
       </div>
 
-      {/* Navigation List */}
       <div className="flex-1 px-3 space-y-0.5 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = pathname.startsWith(item.href);
+
           return (
             <Link
               key={item.name}
               to={item.href}
-              className={`group flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium transition-all duration-150 relative ${isActive ? "bg-indigo-500/12 text-indigo-300" : "text-slate-300 hover:text-white hover:bg-white/4"}`}
+              onClick={() => setMobileOpen(false)}
+              className={`group flex items-center gap-3 px-3 py-2.5 rounded-md text-[13px] font-medium transition-all duration-150 relative ${
+                isActive
+                  ? "bg-indigo-500/12 text-indigo-300"
+                  : "text-slate-300 hover:text-white hover:bg-white/4"
+              }`}
             >
               {isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-indigo-500" />
               )}
+
               <item.icon
-                className={`w-[17px] h-[17px] shrink-0 ${isActive ? "text-indigo-300" : "text-slate-400 group-hover:text-slate-300"}`}
+                className={`w-[17px] h-[17px] shrink-0 ${
+                  isActive
+                    ? "text-indigo-300"
+                    : "text-slate-400 group-hover:text-slate-300"
+                }`}
               />
+
               <span className="flex-1">{item.name}</span>
+
               {isActive && (
                 <ChevronRightIcon className="w-3.5 h-3.5 text-indigo-500/50" />
               )}
@@ -130,7 +155,6 @@ const Sidebar = () => {
         })}
       </div>
 
-      {/* Logout */}
       <div className="p-3 border-t border-white/6">
         <button
           onClick={handleLogout}
@@ -145,12 +169,13 @@ const Sidebar = () => {
 
   return (
     <>
-      {/*Mobile hamburger button */}
-      <button className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-900 text-white rounded-lg shadow-lg border border-white/10">
-        <MenuIcon size={20} onClick={() => setMobileOpen(true)} />
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-slate-900 text-white rounded-lg shadow-lg border border-white/10"
+      >
+        <MenuIcon size={20} />
       </button>
 
-      {/*Mobile overlay */}
       {mobileOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
@@ -158,14 +183,14 @@ const Sidebar = () => {
         />
       )}
 
-      {/* Sidebar - desktop */}
       <aside className="hidden lg:flex flex-col h-full w-65 bg-linear-to-b from-slate-900 via-slate-900 to-slate-950 text-white shrink-0 border-r border-white/4">
         {sidebarContent}
       </aside>
 
-      {/* Sidebar - mobile */}
       <aside
-        className={`lg:hidden fixed inset-y-0 left-0 w-72 bg-linear-to-b from-slate-900 via-slate-900 to-slate-950 text-white z-50 flex flex-col transform transition-transform duraction-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`lg:hidden fixed inset-y-0 left-0 w-72 bg-linear-to-b from-slate-900 via-slate-900 to-slate-950 text-white z-50 flex flex-col transform transition-transform duration-300 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         {sidebarContent}
       </aside>

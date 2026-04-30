@@ -2,7 +2,6 @@ import { Toaster } from "react-hot-toast";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Dashboard from "./pages/Dashboard";
-import Employees from "./pages/Employees";
 import Attendance from "./pages/Attendance";
 import Leave from "./pages/Leave";
 import Payslips from "./pages/Payslips";
@@ -12,6 +11,7 @@ import LoginForm from "./features/auth/components/LoginForm";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import RegisterForm from "./features/auth/components/RegisterForm";
+import CompaniesPage from "./features/company/pages/CompaniesPage";
 
 const App = () => {
   return (
@@ -27,7 +27,7 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/employees" element={<Employees />} />
+            <Route path="/companies" element={<CompaniesPage />} />
             <Route path="/attendance" element={<Attendance />} />
             <Route path="/leave" element={<Leave />} />
             <Route path="/payslips" element={<Payslips />} />
