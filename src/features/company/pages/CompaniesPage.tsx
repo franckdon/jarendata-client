@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const CompaniesPage = () => {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
@@ -214,7 +216,7 @@ const CompaniesPage = () => {
                           <div className="w-10 h-10 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 font-semibold overflow-hidden">
                             {company.logoUrl ? (
                               <img
-                                src={`${import.meta.env.VITE_API_BASE_URL}${company.logoUrl}`}
+                                src={`${BASE_URL}${company.logoUrl}`}
                                 alt={company.name}
                                 className="w-full h-full object-cover"
                               />

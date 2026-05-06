@@ -4,12 +4,14 @@ export type CompanyStatus = "PENDING" | "ACTIVE" | "SUSPENDED" | "DISABLED";
 
 export type CompanySize = "SOLO" | "SMALL" | "MEDIUM" | "LARGE" | "ENTERPRISE";
 
+export type CompanyMemberRole = "OWNER" | "MANAGER" | "ANALYST" | "MEMBER";
+
 export type CompanyUser = {
   id: string;
   fullName: string;
   email: string;
   role: "ADMIN" | "COMPANY";
-  companyRole?: "OWNER" | "MANAGER" | "ANALYST" | "MEMBER" | null;
+  companyRole?: CompanyMemberRole | null;
   isActive: boolean;
   createdAt?: string;
 };
@@ -63,4 +65,23 @@ export type UpdateCompanyPayload = Partial<CreateCompanyPayload>;
 export type UpdateCompanyStatusPayload = {
   id: string;
   status: CompanyStatus;
+};
+
+export type CreateCompanyMemberPayload = {
+  fullName: string;
+  email: string;
+  password: string;
+  companyRole: Exclude<CompanyMemberRole, "OWNER">;
+};
+
+export type UpdateCompanyMemberRolePayload = {
+  companyId: string;
+  userId: string;
+  companyRole: Exclude<CompanyMemberRole, "OWNER">;
+};
+
+export type UpdateCompanyMemberStatusPayload = {
+  companyId: string;
+  userId: string;
+  isActive: boolean;
 };

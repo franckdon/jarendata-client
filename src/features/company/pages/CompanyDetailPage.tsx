@@ -29,6 +29,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import CompanyUsersSection from "../components/CompanyUsersSection";
+import AdminCreditDialog from "@/features/credit/components/AdminCreditDialog";
 
 const statusLabels: Record<CompanyStatus, string> = {
   ACTIVE: "Active",
@@ -90,6 +92,8 @@ const CompanyDetailPage = () => {
   const navigate = useNavigate();
 
   const [openDelete, setOpenDelete] = useState(false);
+
+  const [openCredits, setOpenCredits] = useState(false);
 
   const { data: company, isLoading, isError } = useCompanyById(id);
   const deleteCompanyMutation = useDeleteCompany();
@@ -172,6 +176,14 @@ const CompanyDetailPage = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setOpenCredits(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-indigo-700 bg-indigo-50 hover:bg-indigo-100"
+            >
+              Gérer crédits
+            </button>
+
             <button
               type="button"
               onClick={() => navigate(`/companies/${company.id}/edit`)}
@@ -258,74 +270,7 @@ const CompanyDetailPage = () => {
             </div>
           </div>
 
-          <div className="card p-5">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">
-              Utilisateurs associés
-            </h2>
-
-            {!company.users || company.users.length === 0 ? (
-              <div className="p-6 text-center text-sm text-slate-500 border border-dashed border-slate-200 rounded-xl">
-                Aucun utilisateur associé à cette entreprise.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50 border-b border-slate-200">
-                    <tr>
-                      <th className="text-left px-4 py-3 font-semibold text-slate-600">
-                        Utilisateur
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-slate-600">
-                        Rôle
-                      </th>
-                      <th className="text-left px-4 py-3 font-semibold text-slate-600">
-                        Statut
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="divide-y divide-slate-100">
-                    {company.users.map((user) => (
-                      <tr key={user.id}>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
-                              <UserIcon className="w-4 h-4" />
-                            </div>
-
-                            <div>
-                              <p className="font-medium text-slate-900">
-                                {user.fullName}
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                {user.email}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-
-                        <td className="px-4 py-4 text-slate-600">
-                          {user.companyRole || user.role}
-                        </td>
-
-                        <td className="px-4 py-4">
-                          <span
-                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
-                              user.isActive
-                                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                                : "bg-slate-100 text-slate-600 border-slate-200"
-                            }`}
-                          >
-                            {user.isActive ? "Actif" : "Inactif"}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <CompanyUsersSection company={company} />
         </div>
 
         <div className="space-y-5">
@@ -399,6 +344,13 @@ const CompanyDetailPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AdminCreditDialog
+        companyId={company.id}
+        companyName={company.name}
+        open={openCredits}
+        onOpenChange={setOpenCredits}
+      />
     </div>
   );
 };

@@ -3,13 +3,17 @@ import {
   BuildingIcon,
   CalendarIcon,
   ChevronRightIcon,
+  ContactRoundIcon,
   DollarSignIcon,
   FileTextIcon,
   LayoutGridIcon,
   LogOutIcon,
+  Logs,
+  MegaphoneIcon,
   MenuIcon,
   Settings2Icon,
   UserIcon,
+  Wrench,
   XIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -35,15 +39,33 @@ const Sidebar = () => {
     .slice(0, 2)
     .toUpperCase();
 
-  const navItems = [
+  const adminNavItems = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutGridIcon },
-    role === "ADMIN"
-      ? { name: "Entreprises", href: "/companies", icon: BuildingIcon }
-      : { name: "Attendance", href: "/attendance", icon: CalendarIcon },
-    { name: "Leave", href: "/leave", icon: FileTextIcon },
-    { name: "Payslips", href: "/payslips", icon: DollarSignIcon },
-    { name: "Settings", href: "/settings", icon: Settings2Icon },
+    { name: "Entreprises", href: "/companies", icon: BuildingIcon },
+    { name: "Crédits", href: "/credits", icon: DollarSignIcon },
+    {
+      name: "Configuration WhatsApp",
+      href: "/messaging/settings",
+      icon: Wrench,
+    },
+    { name: "Paramètres", href: "/settings", icon: Settings2Icon },
   ];
+
+  const companyNavItems = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutGridIcon },
+    { name: "Audience", href: "/audience", icon: ContactRoundIcon },
+    { name: "Campagnes", href: "/campaigns", icon: MegaphoneIcon },
+    { name: "Crédits", href: "/credits", icon: DollarSignIcon },
+    {
+      name: "Configuration WhatsApp",
+      href: "/messaging/settings",
+      icon: Wrench,
+    },
+    { name: "Logs WhatsApp", href: "/messaging/logs", icon: Logs },
+    { name: "Paramètres", href: "/settings", icon: Settings2Icon },
+  ];
+
+  const navItems = role === "ADMIN" ? adminNavItems : companyNavItems;
 
   const handleLogout = () => {
     logout();

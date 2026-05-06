@@ -11,6 +11,8 @@ import {
 import { SaveIcon, XIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 type CompanyFormProps = {
   initialData?: Company;
   isSubmitting?: boolean;
@@ -89,12 +91,27 @@ const CompanyForm = ({
       logo: file,
     }));
 
-    setLogoPreview(URL.createObjectURL(file));
+    const previewUrl = URL.createObjectURL(file);
+    setLogoPreview(previewUrl);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     await onSubmit(cleanPayload());
+  };
+
+  const getLogoSrc = () => {
+    if (!logoPreview) return null;
+
+    if (
+      logoPreview.startsWith("blob:") ||
+      logoPreview.startsWith("http://") ||
+      logoPreview.startsWith("https://")
+    ) {
+      return logoPreview;
+    }
+
+    return `${BASE_URL}${logoPreview}`;
   };
 
   return (
@@ -112,9 +129,9 @@ const CompanyForm = ({
 
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-xl border border-slate-200 bg-slate-50 overflow-hidden flex items-center justify-center">
-                {logoPreview ? (
+                {getLogoSrc() ? (
                   <img
-                    src={logoPreview}
+                    src={getLogoSrc()!}
                     alt="Logo entreprise"
                     className="w-full h-full object-cover"
                   />
