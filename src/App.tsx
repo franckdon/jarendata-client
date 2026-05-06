@@ -18,6 +18,7 @@ import MessagingSettingsPage from "./features/messaging/pages/MessagingSettingsP
 import MessageLogsPage from "./features/messaging/pages/MessageLogsPage";
 import CreditsPage from "./features/credit/pages/CreditsPage";
 import SettingsPage from "./features/settings/pages/SettingsPage";
+import HomePage from "./pages/HomePage";
 
 const App = () => {
   return (
@@ -25,6 +26,8 @@ const App = () => {
       <Toaster position="top-right" />
 
       <Routes>
+        <Route path="/" element={<HomePage />} />
+
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />

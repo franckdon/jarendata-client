@@ -50,10 +50,10 @@ const LoginForm = ({
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white">
         <div className="w-full max-w-md animate-fade-in">
           <Link
-            to="/login"
+            to="/"
             className="inline-flex items-center gap-2 text-slate-400 hover:text-slate-700 text-sm mb-10"
           >
-            <ArrowLeftIcon size={16} /> Back
+            <ArrowLeftIcon size={16} /> Retour
           </Link>
 
           <div className="mb-8">
