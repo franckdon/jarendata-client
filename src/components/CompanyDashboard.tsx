@@ -1,79 +1,209 @@
 import {
-  ArrowRightIcon,
-  CalendarIcon,
-  DollarSignIcon,
-  FileTextIcon,
+  CoinsIcon,
+  ContactRoundIcon,
+  MegaphoneIcon,
+  MessageCircleIcon,
+  TrendingUpIcon,
+  ClipboardListIcon,
 } from "lucide-react";
-import React from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import StatCard from "../components/StatCard";
+import ChartCard from "../components/ChartCard";
+import { companyDashboardMock } from "../data/dashboard.mock";
 import { Link } from "react-router-dom";
 
-const CompanyDashboard = ({ data }) => {
-  const emp = data.employee;
+const CompanyDashboard = () => {
+  const data = companyDashboardMock;
 
-  const cards = [
-    {
-      icon: CalendarIcon,
-      value: data.currentMonthAttendance,
-      title: "Days Present",
-      subtitle: "This month",
-    },
-    {
-      icon: FileTextIcon,
-      value: data.pendingLeaves,
-      title: "Pending Leaves",
-      subtitle: "Awaiting approval",
-    },
-    {
-      icon: DollarSignIcon,
-      value: data.latestPayslip
-        ? `$${data.latestPayslip.netSalary?.toLocaleString()}`
-        : "N/A",
-      title: "Latest Payslip",
-      subtitle: "most recent payout",
-    },
-  ];
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in space-y-6">
       <div className="page-header">
-        <h1 className="page-title"> Welcome, {emp?.firstName}!</h1>
+        <h1 className="page-title">Dashboard entreprise</h1>
         <p className="page-subtitle">
-          {emp?.position} - {emp?.department || "No department assigned"}
+          Suivez votre audience, vos campagnes, vos crédits et les réponses
+          collectées.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-8">
-        {cards.map((card, index) => (
-          <div
-            key={index}
-            className="card card-hover p-5 sm:p-6 relative overflow-hidden group flex items-center justify-between"
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+        <StatCard
+          title="Audience"
+          value={data.stats.contacts.toLocaleString()}
+          subtitle="Contacts enregistrés"
+          icon={ContactRoundIcon}
+        />
+
+        <StatCard
+          title="Campagnes actives"
+          value={data.stats.activeCampaigns}
+          subtitle="En cours ou planifiées"
+          icon={MegaphoneIcon}
+        />
+
+        <StatCard
+          title="Crédits restants"
+          value={data.stats.creditsBalance.toLocaleString()}
+          subtitle="Solde disponible"
+          icon={CoinsIcon}
+        />
+
+        <StatCard
+          title="Taux réponse"
+          value={`${data.stats.responseRate}%`}
+          subtitle="Moyenne campagnes"
+          icon={TrendingUpIcon}
+        />
+
+        <StatCard
+          title="Messages envoyés"
+          value={data.stats.messagesSent.toLocaleString()}
+          subtitle="WhatsApp"
+          icon={MessageCircleIcon}
+        />
+
+        <StatCard
+          title="Réponses"
+          value={data.stats.answersCollected.toLocaleString()}
+          subtitle="Collectées"
+          icon={ClipboardListIcon}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <div className="xl:col-span-2">
+          <ChartCard
+            title="Réponses collectées"
+            subtitle="Évolution sur les 7 derniers jours"
           >
-            <div>
-              <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-slate-500/70 group-hover:bg-indigo-500/70" />
-              <p className="text-sm font-medium text-slate-700">{card.title}</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">
-                {card.value}
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data.responsesByDay}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="day" />
+                <YAxis />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="responses"
+                  name="Réponses"
+                  strokeWidth={3}
+                  dot
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+
+        <ChartCard title="Contacts par source">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data.contactsBySource}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={4}
+              >
+                {data.contactsBySource.map((_, index) => (
+                  <Cell key={index} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <ChartCard
+          title="Performance des campagnes"
+          subtitle="Messages envoyés vs réponses"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.campaignPerformance}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="sent" name="Envoyés" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="responses" name="Réponses" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <div className="card p-5">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">
+            Actions rapides
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Link
+              to="/audience"
+              className="p-4 rounded-xl bg-indigo-50 border border-indigo-100 hover:bg-indigo-100"
+            >
+              <p className="font-semibold text-indigo-800">Gérer l’audience</p>
+              <p className="text-sm text-indigo-700 mt-1">
+                Ajouter, importer ou filtrer vos contacts.
               </p>
-            </div>
-            <card.icon className="size-10 p-2.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors duration-200" />
+            </Link>
+
+            <Link
+              to="/campaigns"
+              className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 hover:bg-emerald-100"
+            >
+              <p className="font-semibold text-emerald-800">
+                Créer une campagne
+              </p>
+              <p className="text-sm text-emerald-700 mt-1">
+                Lancer une enquête WhatsApp.
+              </p>
+            </Link>
+
+            <Link
+              to="/credits"
+              className="p-4 rounded-xl bg-amber-50 border border-amber-100 hover:bg-amber-100"
+            >
+              <p className="font-semibold text-amber-800">Voir les crédits</p>
+              <p className="text-sm text-amber-700 mt-1">
+                Suivre le solde et les mouvements.
+              </p>
+            </Link>
+
+            <Link
+              to="/messaging/logs"
+              className="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:bg-slate-100"
+            >
+              <p className="font-semibold text-slate-800">Logs WhatsApp</p>
+              <p className="text-sm text-slate-600 mt-1">
+                Vérifier les messages envoyés et reçus.
+              </p>
+            </Link>
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <Link
-          to="/attendance"
-          className="btn-primary text-center inline-flex itemps-center justify-center gap-2"
-        >
-          Mark Attendance <ArrowRightIcon className="w-4 h-4" />
-        </Link>
-
-        <Link
-          to="/leave"
-          className="btn-secondary text-center inline-flex itemps-center justify-center gap-2"
-        >
-          Apply for Leave
-        </Link>
-      </div>
+      {data.stats.creditsBalance < 1000 && (
+        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200">
+          <p className="font-medium text-rose-800">Crédits faibles</p>
+          <p className="text-sm text-rose-700 mt-1">
+            Votre solde est faible. Pensez à recharger avant de lancer une
+            nouvelle campagne.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

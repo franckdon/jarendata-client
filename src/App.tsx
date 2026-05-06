@@ -17,6 +17,7 @@ import CampaignDetailPage from "./features/campaign/pages/CampaignDetailPage";
 import MessagingSettingsPage from "./features/messaging/pages/MessagingSettingsPage";
 import MessageLogsPage from "./features/messaging/pages/MessageLogsPage";
 import CreditsPage from "./features/credit/pages/CreditsPage";
+import SettingsPage from "./features/settings/pages/SettingsPage";
 
 const App = () => {
   return (
@@ -51,7 +52,7 @@ const App = () => {
 
             <Route path="/credits" element={<CreditsPage />} />
 
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
         </Route>
 

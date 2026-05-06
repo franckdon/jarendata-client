@@ -1,64 +1,183 @@
 import {
   Building2Icon,
-  Calendar1Icon,
-  FileTextIcon,
+  CoinsIcon,
+  MegaphoneIcon,
+  MessageCircleIcon,
+  TrendingUpIcon,
   UsersIcon,
 } from "lucide-react";
-import React from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+import StatCard from "../components/StatCard";
+import ChartCard from "../components/ChartCard";
+import { adminDashboardMock } from "../data/dashboard.mock";
 
-const AdminDashboard = ({ data }) => {
-  const stats = [
-    {
-      icon: UsersIcon,
-      value: data.totalEmployees,
-      label: "Total Employees",
-      description: "Active workforce",
-    },
-    {
-      icon: Building2Icon,
-      value: data.totalDepartments,
-      label: "Departments",
-      description: "Organizational units",
-    },
-    {
-      icon: Calendar1Icon,
-      value: data.todayAttendance,
-      label: "Today's Attendance",
-      description: "Check in, today",
-    },
-    {
-      icon: FileTextIcon,
-      value: data.pendingLeaves,
-      label: "Pending Leaves",
-      description: "Awaiting approval",
-    },
-  ];
+const AdminDashboard = () => {
+  const data = adminDashboardMock;
+
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in space-y-6">
       <div className="page-header">
-        <h1 className="page-title"> Dashboard</h1>
+        <h1 className="page-title">Dashboard administrateur</h1>
         <p className="page-subtitle">
-          Welcome back, Admin! Here's an overview of the company's performance
-          and employee status. Keep up the great work managing your team!
+          Vue globale de la plateforme, des entreprises, campagnes, crédits et
+          messages.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="card card-hover p-5 sm:p-6 relative overflow-hidden group flex items-center justify-between"
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4">
+        <StatCard
+          title="Entreprises"
+          value={data.stats.totalCompanies}
+          subtitle={`${data.stats.activeCompanies} actives`}
+          icon={Building2Icon}
+          trend="+12% ce mois"
+        />
+
+        <StatCard
+          title="Campagnes"
+          value={data.stats.totalCampaigns}
+          subtitle="Toutes entreprises"
+          icon={MegaphoneIcon}
+        />
+
+        <StatCard
+          title="Crédits consommés"
+          value={data.stats.creditsConsumed.toLocaleString()}
+          subtitle="Total plateforme"
+          icon={CoinsIcon}
+        />
+
+        <StatCard
+          title="Messages envoyés"
+          value={data.stats.messagesSent.toLocaleString()}
+          subtitle="WhatsApp"
+          icon={MessageCircleIcon}
+        />
+
+        <StatCard
+          title="Taux réponse"
+          value={`${data.stats.averageResponseRate}%`}
+          subtitle="Moyenne globale"
+          icon={TrendingUpIcon}
+        />
+
+        <StatCard
+          title="Clients actifs"
+          value={data.stats.activeCompanies}
+          subtitle="Comptes COMPANY"
+          icon={UsersIcon}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+        <div className="xl:col-span-2">
+          <ChartCard
+            title="Évolution campagnes / réponses"
+            subtitle="Volume mensuel sur la plateforme"
           >
-            <div>
-              <div className="absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-slate-500/70 group-hover:bg-indigo-500/70" />
-              <p className="text-sm font-medium text-slate-700">{s.label}</p>
-              <p className="text-2xl font-bold text-slate-900 mt-1">
-                {s.value}
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data.campaignsByMonth}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Bar
+                  dataKey="campaigns"
+                  name="Campagnes"
+                  radius={[6, 6, 0, 0]}
+                />
+                <Bar
+                  dataKey="responses"
+                  name="Réponses"
+                  radius={[6, 6, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+
+        <ChartCard title="Entreprises par statut">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data.companiesByStatus}
+                dataKey="value"
+                nameKey="name"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={4}
+              >
+                {data.companiesByStatus.map((_, index) => (
+                  <Cell key={index} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartCard>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <ChartCard
+          title="Top entreprises consommatrices"
+          subtitle="Classement par crédits consommés"
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data.topCompanies} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis dataKey="name" type="category" width={120} />
+              <Tooltip />
+              <Bar dataKey="credits" name="Crédits" radius={[0, 6, 6, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <div className="card p-5">
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">
+            Alertes plateforme
+          </h2>
+
+          <div className="space-y-3">
+            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
+              <p className="font-medium text-amber-800">
+                18 entreprises en attente d’activation
+              </p>
+              <p className="text-sm text-amber-700 mt-1">
+                Pensez à vérifier les nouveaux comptes.
               </p>
             </div>
-            <s.icon className="size-10 p-2.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors duration-200" />
+
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200">
+              <p className="font-medium text-rose-800">
+                9 entreprises suspendues
+              </p>
+              <p className="text-sm text-rose-700 mt-1">
+                Vérifier les statuts et la consommation de crédits.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-200">
+              <p className="font-medium text-indigo-800">
+                Pic d’activité sur les campagnes NPS
+              </p>
+              <p className="text-sm text-indigo-700 mt-1">
+                Opportunité d’améliorer les templates recommandés.
+              </p>
+            </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

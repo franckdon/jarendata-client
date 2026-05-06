@@ -7,8 +7,12 @@ type AuthState = {
   user: User | null;
   isAuthenticated: boolean;
   hasHydrated: boolean;
+
   setAuth: (user: User) => void;
+  setUser: (user: User) => void;
+
   setHasHydrated: (value: boolean) => void;
+
   logout: () => void;
 };
 
@@ -24,6 +28,11 @@ export const useAuthStore = create<AuthState>((set) => ({
       hasHydrated: true,
     }),
 
+  setUser: (user) =>
+    set({
+      user,
+    }),
+
   setHasHydrated: (value) =>
     set({
       hasHydrated: value,
@@ -31,6 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     localStorage.removeItem("jarendata_token");
+
     set({
       user: null,
       isAuthenticated: false,
